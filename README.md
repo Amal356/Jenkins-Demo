@@ -1,66 +1,44 @@
-# DevOps-Example
-This is a sample Spring Boot Application, used to explain the Jenkins pipeline, in creating a full CI/CD flow using docker too.
+# CI/CD avec Jenkins – Compte rendu des Labs 1 et 2
 
-# Jenkins 
-Jenkins is an open source automation server written in Java. Jenkins helps to automate the non-human part of the software development process,
- with continuous integration and facilitating technical aspects of continuous delivery. It is a server-based system that runs in servlet containers 
- such as Apache Tomcat.
- 
-# Docker 
+**Étudiante :** Amal Jemli – Master DevOps et Cloud Computing
+**Enseignant :** Wahid Hamdi
+**Dépôt :** fork de [wahid007/Jenkins-Demo](https://github.com/wahid007/Jenkins-Demo) → [Amal356/Jenkins-Demo](https://github.com/Amal356/Jenkins-Demo)
 
-Docker is a collection of interoperating software-as-a-service and platform-as-a-service offerings that employ operating-system-level virtualization 
-to cultivate development and delivery of software inside standardized software packages called containers. The software that hosts the containers 
-is called Docker Engine.
+Application utilisée : une application **Spring Boot** (Java) qui affiche une page HTML sur le port **2222**.
 
-# Using Jenkins with Docker
-First of all to use jenkins with docker, we will have to know that as we are running Jenkins inside a docker container, and we need access to docker to
-build our services images, so first of all let's build a Jenkins image with docker installed inside it. Let's check the dockerfile to 
-build this Jenkins image with docker inside, you will just have to put this file into any folder, and run the docker build command.
+## Sommaire
 
-# Dockerfile for Jenkins
-```
-from jenkins/jenkins:lts
-USER root
-RUN apt-get update -qq \
-    && apt-get install -qqy apt-transport-https ca-certificates curl gnupg2 software-properties-common
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-RUN add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
-   $(lsb_release -cs) \
-   stable"
-RUN apt-get update  -qq \
-    && apt-get install docker-ce=17.12.1~ce-0~debian -y
-RUN usermod -aG docker jenkins
-```
+| Lab | Contenu | Compte rendu |
+|---|---|---|
+| **Lab 1 – Jenkins CI/CD Pipeline** | Workflow manuel (Maven, Docker, Docker Hub, Kubernetes K3S), puis jobs Jenkins Freestyle et challenge de déploiement automatique sur Kubernetes | [lab1/README.md](lab1/README.md) |
+| **Lab 2 – Prise en main et utilisation de Jenkins** | Plugins, configuration de JDK / Maven / Docker, cloud Docker, pipeline défini par un Jenkinsfile | [lab2/README.md](lab2/README.md) |
 
-Just place this Dockerfile in any folder and run the following commands:
+## Environnement
 
-$ docker image build -t jenkins-docker .
+| Élément | Version / valeur |
+|---|---|
+| Machine virtuelle | Ubuntu Server 26.04 sous VirtualBox (4 Go RAM, 2 CPU, réseau NAT) |
+| Java | OpenJDK 21 |
+| Maven | 3.9.12 (VM) / 3.9.16 (installé par Jenkins) |
+| Docker | 29.8 |
+| Kubernetes | K3S v1.36.5 |
+| Jenkins | 2.580.1 (installé en service) |
 
-Now that the docker image has already been built, we can run the Jenkins in a docker container with the command:
+Accès depuis la machine physique (redirections de ports VirtualBox) :
 
-$ docker container run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock jenkins-docker
+| Service | Port Windows | Port VM |
+|---|---|---|
+| SSH | 2222 | 22 |
+| Jenkins | 8080 | 8080 |
+| Application (conteneur Docker) | 8082 | 2222 |
+| Application (Kubernetes NodePort) | 30222 | 30222 |
 
-# Building Spring Boot Application
-The Sample application built here has the maven jar plugin, so in order to build that as a jar, we just have to do the command:
+## Fichiers ajoutés au projet
 
-$ mvn clean install
-
-# Using with AWS ECS and ECR
-
-First of all you will have to push your image to Amazon ECR, so in order to do this via command line interface, we have to have
-the aws cli installed on our computer. After that we will have to synchronize the docker login with the AWS account, with the command:
-
-$(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-
-After that you will sync the two accounts, and are able to build and push your image. So, just build the image:
-
-$ docker build -t devops-service . 
-
-Tag you image:
-
-$ docker tag devops-service:latest $AWS_IAM_USER_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/devops-service:latest
-
-Finally run thios command for pushing the image:
-
-docker push $AWS_IAM_USER_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/devops-service:latest
+| Fichier | Rôle |
+|---|---|
+| `Dockerfile` | image de l'application (`eclipse-temurin:17-jre`) |
+| `deployment.yaml`, `service.yaml` | déploiement Kubernetes (2 réplicas, NodePort 30222) |
+| `freestyle/script.sh`, `freestyle/Test.java` | script récupéré depuis GitHub par le job freestyle |
+| `Jenkinsfile` | pipeline du Lab 2 |
+| `lab1/`, `lab2/` | comptes rendus et captures d'écran |
