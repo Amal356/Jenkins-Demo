@@ -7,6 +7,11 @@ Objectif : construire un pipeline CI/CD avec Jenkins qui **clone le projet**, le
 Prérequis déjà en place (Lab 1) : VM Ubuntu Server 26.04 avec Docker, Kubernetes (K3S) et Jenkins installé en service ; fork du projet [Amal356/Jenkins-Demo](https://github.com/Amal356/Jenkins-Demo) avec une page HTML modifiée.
 
 ---
+## 0. Installation de Java et Jenkins
+
+Jenkins a été installé en tant que service sur la VM pendant l'Activité 1 : installation de `openjdk-21-jre`, ajout du dépôt officiel Jenkins, activation du service, déverrouillage avec le mot de passe initial, installation des plugins suggérés et création du compte administrateur.
+
+Compte rendu et captures : [cv-devsecops/04-jenkins](https://github.com/Amal356/cv-devsecops/tree/main/04-jenkins)
 
 ## 1. Ajouter les plugins
 
